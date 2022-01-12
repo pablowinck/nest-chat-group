@@ -1,0 +1,23 @@
+version: '3.3'
+volumes:
+  postgres:
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/mysql
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "123456"
+      POSTGRES_DB: "postgres"
+  app:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "pablowinck123@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "123456"
+    ports:
+      - "80:80"
+    depends_on:
+      - db
