@@ -11,27 +11,34 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-
+  id           Int       @id @default(autoincrement())
   name         String
-  email        String
+  email        String    @unique
   password     String
-  profileImage String
+  profileImage String?
   createdAt    DateTime
+  channels     Channel[]
+  Message      Message[]
 }
 
-// model Channel {
-//     id           Int      @id @default(autoincrement())
+model Channel {
+  id        Int       @id @default(autoincrement())
+  name      String
+  topic     String
+  image     String
+  members   User[]
+  messages  Message[]
+  createdAt DateTime
+  isPrivate Boolean
+  password  String?
+}
 
-//   name String
-//   topic String
-//   image String
-//   members User[]
-//   messages Message[]
-//   private {
-//     isPrivate boolean
-//     password String
-//   }
-//   isSelected boolean
-//   hasNotifications boolean
-// }
+model Message {
+  id        Int      @id @default(autoincrement())
+  text      String
+  createdAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  userId    Int
+  channelId Int
+}

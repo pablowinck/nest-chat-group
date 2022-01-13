@@ -10,14 +10,18 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const channels_module_1 = require("./channels/channels.module");
+const messages_module_1 = require("./messages/messages.module");
+const prisma_service_1 = require("./prisma/prisma.service");
+const users_module_1 = require("./users/users.module");
 const websocket_service_1 = require("./websocket/websocket.service");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [],
+        imports: [users_module_1.UsersModule, channels_module_1.ChannelsModule, messages_module_1.MessagesModule],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, websocket_service_1.WebsocketService],
+        providers: [app_service_1.AppService, websocket_service_1.WebsocketService, prisma_service_1.PrismaService, messages_module_1.MessagesModule],
     })
 ], AppModule);
 exports.AppModule = AppModule;

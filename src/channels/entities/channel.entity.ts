@@ -1,3 +1,4 @@
+import { Message } from "@prisma/client";
 import { User } from "src/users/entities/user.entity";
 
 export class Channel {
@@ -7,16 +8,6 @@ export class Channel {
   image: string;
   members: User[];
   messages: Message[];
-  private: {
-    isPrivate: boolean;
-    password: string;
-  };
-  isSelected: boolean;
-  hasNotifications: boolean;
+  isPrivate: boolean;
+  password: string;
 }
-
-export type Message = {
-  user: User;
-  content: string;
-  createdAt: Date;
-};

@@ -15,14 +15,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketService = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
+const user_entity_1 = require("../users/entities/user.entity");
 let WebsocketService = class WebsocketService {
     constructor() {
         this.messages = [];
+        this.connectedClients = [];
     }
     handleConnection(client) {
-        console.log("connected");
-        console.log(client);
+        this.connectedClients.push(client);
+        for (const [index, c] of this.connectedClients.entries()) {
+            if (c.idUser == client.handshake.query.uid) {
+                this.connectedClients.splice(index, 1);
+            }
+        }
     }
+    onJoin(user) { }
     listenForMessages(client, message) {
         this.messages.push(message);
         client.broadcast.emit("new-message", message);
@@ -32,6 +39,12 @@ __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
 ], WebsocketService.prototype, "server", void 0);
+__decorate([
+    (0, websockets_1.SubscribeMessage)("join"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_entity_1.User]),
+    __metadata("design:returntype", void 0)
+], WebsocketService.prototype, "onJoin", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)("send-message"),
     __param(0, (0, websockets_1.ConnectedSocket)()),
