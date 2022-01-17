@@ -17,9 +17,6 @@ let UsersService = class UsersService {
         this.prisma = prisma;
     }
     create(createUserDto) {
-        if (this.prisma.user.findFirst({ where: { email: createUserDto.email } })) {
-            throw new common_1.HttpException("User with this email already exists", common_1.HttpStatus.CONFLICT);
-        }
         return this.prisma.user.create({
             data: {
                 name: createUserDto.name,
@@ -28,6 +25,27 @@ let UsersService = class UsersService {
                 profileImage: createUserDto.profileImage,
                 createdAt: new Date(),
             },
+        });
+    }
+    login(loginUserDto) {
+        const user = this.prisma.user.findUnique({
+            where: { email: loginUserDto.email },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                password: true,
+                profileImage: true,
+            },
+            rejectOnNotFound: true,
+        });
+        if (!user)
+            throw new common_1.HttpException("User not found", common_1.HttpStatus.NOT_FOUND);
+        return user.then((data) => {
+            if (data.password !== loginUserDto.password) {
+                throw new common_1.HttpException("Password is incorrect", common_1.HttpStatus.UNAUTHORIZED);
+            }
+            return data;
         });
     }
     findAll() {
