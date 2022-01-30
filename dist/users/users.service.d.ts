@@ -7,11 +7,10 @@ export declare class UsersService {
     constructor(prisma: PrismaService);
     create(createUserDto: CreateUserDto): import(".prisma/client").Prisma.Prisma__UserClient<import(".prisma/client").User>;
     login(loginUserDto: LoginUserDto): Promise<{
+        id: number;
         name: string;
         email: string;
-        password: string;
         profileImage: string;
-        id: number;
     }>;
     findAll(): import(".prisma/client").PrismaPromise<import(".prisma/client").User[]>;
     findOne(id: number): import(".prisma/client").Prisma.Prisma__UserClient<import(".prisma/client").User>;

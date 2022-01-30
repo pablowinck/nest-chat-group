@@ -34,6 +34,26 @@ export class MessagesService {
     return message;
   }
 
+  findByChannelId(channelId: number) {
+    if (!channelId)
+      throw new HttpException("channelId is required", HttpStatus.BAD_REQUEST);
+    return this.prisma.message.findMany({
+      where: { channelId },
+      select: {
+        id: true,
+        text: true,
+        createdAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
   update(id: number, updateMessageDto: UpdateMessageDto) {
     this.findOne(id);
     return this.prisma.message.update({

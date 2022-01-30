@@ -8,14 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelsModule = void 0;
 const common_1 = require("@nestjs/common");
-const channels_service_1 = require("./channels.service");
+const prisma_service_1 = require("../prisma/prisma.service");
 const channels_controller_1 = require("./channels.controller");
+const channels_service_1 = require("./channels.service");
 let ChannelsModule = class ChannelsModule {
 };
 ChannelsModule = __decorate([
     (0, common_1.Module)({
         controllers: [channels_controller_1.ChannelsController],
-        providers: [channels_service_1.ChannelsService]
+        providers: [channels_service_1.ChannelsService, prisma_service_1.PrismaService],
     })
 ], ChannelsModule);
 exports.ChannelsModule = ChannelsModule;

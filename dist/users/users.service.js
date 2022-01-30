@@ -8,9 +8,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const prisma_service_1 = require("../prisma/prisma.service");
 let UsersService = class UsersService {
     constructor(prisma) {
@@ -21,7 +25,7 @@ let UsersService = class UsersService {
             data: {
                 name: createUserDto.name,
                 email: createUserDto.email,
-                password: createUserDto.password,
+                password: bcrypt_1.default.hashSync(createUserDto.password, 10),
                 profileImage: createUserDto.profileImage,
                 createdAt: new Date(),
             },
@@ -42,10 +46,18 @@ let UsersService = class UsersService {
         if (!user)
             throw new common_1.HttpException("User not found", common_1.HttpStatus.NOT_FOUND);
         return user.then((data) => {
-            if (data.password !== loginUserDto.password) {
-                throw new common_1.HttpException("Password is incorrect", common_1.HttpStatus.UNAUTHORIZED);
-            }
-            return data;
+            bcrypt_1.default.hash(loginUserDto.password, 10).then((hash) => {
+                bcrypt_1.default.compare(hash, data.password, (err, result) => {
+                    if (err)
+                        throw new common_1.HttpException("Wrong password", common_1.HttpStatus.BAD_REQUEST);
+                });
+            });
+            return {
+                id: data.id,
+                name: data.name,
+                email: data.email,
+                profileImage: data.profileImage,
+            };
         });
     }
     findAll() {

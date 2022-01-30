@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import bcrypt from "bcrypt";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
@@ -18,7 +19,7 @@ export class UsersService {
       data: {
         name: createUserDto.name,
         email: createUserDto.email,
-        password: createUserDto.password,
+        password: bcrypt.hashSync(createUserDto.password, 10),
         profileImage: createUserDto.profileImage,
         createdAt: new Date(),
       },
@@ -26,6 +27,10 @@ export class UsersService {
   }
 
   login(loginUserDto: LoginUserDto) {
+    // bcrypt.hash(loginUserDto.password, 10).then((hash) => {
+    //   console.log("password", hash);
+    // });
+
     const user = this.prisma.user.findUnique({
       where: { email: loginUserDto.email },
       select: {
@@ -41,13 +46,25 @@ export class UsersService {
     if (!user) throw new HttpException("User not found", HttpStatus.NOT_FOUND);
 
     return user.then((data) => {
-      if (data.password !== loginUserDto.password) {
-        throw new HttpException(
-          "Password is incorrect",
-          HttpStatus.UNAUTHORIZED
-        );
-      }
-      return data;
+      bcrypt.hash(loginUserDto.password, 10).then((hash) => {
+        bcrypt.compare(hash, data.password, (err, result) => {
+          if (err)
+            throw new HttpException("Wrong password", HttpStatus.BAD_REQUEST);
+        });
+      });
+
+      // if (data.password !== loginUserDto.password) {
+      //   throw new HttpException(
+      //     "Password is incorrect",
+      //     HttpStatus.UNAUTHORIZED
+      //   );
+      // }
+      return {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        profileImage: data.profileImage,
+      };
     });
   }
 

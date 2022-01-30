@@ -1,13 +1,11 @@
 version: '3.3'
-volumes:
-  postgres:
 services:
   db:
     image: postgres
     ports:
       - "5432:5432"
     volumes:
-      - postgres:/var/lib/mysql
+      - ./postgres:/var/lib/mysql
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "123456"

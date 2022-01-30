@@ -28,7 +28,9 @@
     "@nestjs/platform-socket.io": "^8.2.4",
     "@nestjs/websockets": "^8.2.4",
     "@prisma/client": "3.8.0",
+    "@types/bcrypt": "^5.0.0",
     "@types/socket.io": "^3.0.2",
+    "bcrypt": "^5.0.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"

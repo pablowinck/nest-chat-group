@@ -40,6 +40,25 @@ let MessagesService = class MessagesService {
             throw new common_1.HttpException("Message not found", common_1.HttpStatus.NOT_FOUND);
         return message;
     }
+    findByChannelId(channelId) {
+        if (!channelId)
+            throw new common_1.HttpException("channelId is required", common_1.HttpStatus.BAD_REQUEST);
+        return this.prisma.message.findMany({
+            where: { channelId },
+            select: {
+                id: true,
+                text: true,
+                createdAt: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    },
+                },
+            },
+        });
+    }
     update(id, updateMessageDto) {
         this.findOne(id);
         return this.prisma.message.update({

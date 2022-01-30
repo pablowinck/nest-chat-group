@@ -13,26 +13,62 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketService = void 0;
+const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const user_entity_1 = require("../users/entities/user.entity");
+const create_message_dto_1 = require("../messages/dto/create-message.dto");
+const messages_service_1 = require("../messages/messages.service");
+const users_service_1 = require("../users/users.service");
 let WebsocketService = class WebsocketService {
     constructor() {
-        this.messages = [];
         this.connectedClients = [];
     }
     handleConnection(client) {
         this.connectedClients.push(client);
+        client.join(client.id);
         for (const [index, c] of this.connectedClients.entries()) {
             if (c.idUser == client.handshake.query.uid) {
                 this.connectedClients.splice(index, 1);
             }
         }
     }
-    onJoin(user) { }
+    onJoin(client, channel) {
+        client.rooms.forEach((room) => {
+            client.leave(room);
+        });
+        if (!channel || !channel[0])
+            return;
+        console.log("[onJoin]", channel[1]);
+        client.join(channel[1]);
+        console.log("[onJoin]", client.id);
+        client.join(client.id);
+        console.log("[allRooms]", client.rooms);
+        this.messagesService.findByChannelId(+channel[0]).then((messages) => {
+            this.server.to(client.id).emit("load-messages", messages.map((message) => {
+                return {
+                    user: message.user,
+                    content: message.text,
+                    createdAt: message.createdAt,
+                };
+            }));
+        });
+    }
     listenForMessages(client, message) {
-        this.messages.push(message);
-        client.broadcast.emit("new-message", message);
+        console.log("[WebsocketService] send-message", message);
+        console.log("[rooms]", client.rooms);
+        console.log("[current room]", "" + message.channelId);
+        console.log("[index 0 rooms]", client.rooms.values().next().value);
+        this.messagesService.create(message).then((newMessage) => {
+            this.usersService.findOne(newMessage.userId).then((user) => {
+                this.server.sockets
+                    .in(client.rooms.values().next().value)
+                    .emit("new-message", {
+                    user: user,
+                    content: newMessage.text,
+                    createdAt: newMessage.createdAt,
+                });
+            });
+        });
     }
 };
 __decorate([
@@ -40,9 +76,19 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], WebsocketService.prototype, "server", void 0);
 __decorate([
+    (0, common_1.Inject)((0, common_1.forwardRef)(() => messages_service_1.MessagesService)),
+    __metadata("design:type", messages_service_1.MessagesService)
+], WebsocketService.prototype, "messagesService", void 0);
+__decorate([
+    (0, common_1.Inject)((0, common_1.forwardRef)(() => users_service_1.UsersService)),
+    __metadata("design:type", users_service_1.UsersService)
+], WebsocketService.prototype, "usersService", void 0);
+__decorate([
     (0, websockets_1.SubscribeMessage)("join"),
+    __param(0, (0, websockets_1.ConnectedSocket)()),
+    __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_entity_1.User]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Array]),
     __metadata("design:returntype", void 0)
 ], WebsocketService.prototype, "onJoin", null);
 __decorate([
@@ -50,7 +96,8 @@ __decorate([
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, String]),
+    __metadata("design:paramtypes", [socket_io_1.Socket,
+        create_message_dto_1.CreateMessageDto]),
     __metadata("design:returntype", void 0)
 ], WebsocketService.prototype, "listenForMessages", null);
 WebsocketService = __decorate([
