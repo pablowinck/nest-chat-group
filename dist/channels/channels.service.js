@@ -50,8 +50,6 @@ let ChannelsService = class ChannelsService {
         });
     }
     addMember(channelId, userId) {
-        console.log("[userId]", userId);
-        console.log("[channelId]", channelId);
         this.findOne(channelId);
         return this.prisma.channel.update({
             where: { id: channelId },

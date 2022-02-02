@@ -53,6 +53,7 @@ let MessagesService = class MessagesService {
                     select: {
                         id: true,
                         name: true,
+                        profileImage: true,
                         email: true,
                     },
                 },

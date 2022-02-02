@@ -8,14 +8,15 @@ export declare class MessagesService {
     findAll(): import(".prisma/client").PrismaPromise<import(".prisma/client").Message[]>;
     findOne(id: number): import(".prisma/client").Prisma.Prisma__MessageClient<import(".prisma/client").Message>;
     findByChannelId(channelId: number): import(".prisma/client").PrismaPromise<{
-        createdAt: Date;
-        id: number;
-        user: {
-            name: string;
-            email: string;
-            id: number;
-        };
         text: string;
+        createdAt: Date;
+        user: {
+            id: number;
+            name: string;
+            profileImage: string;
+            email: string;
+        };
+        id: number;
     }[]>;
     update(id: number, updateMessageDto: UpdateMessageDto): import(".prisma/client").Prisma.Prisma__MessageClient<import(".prisma/client").Message>;
     remove(id: number): import(".prisma/client").Prisma.Prisma__MessageClient<import(".prisma/client").Message>;
