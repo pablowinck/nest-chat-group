@@ -76,7 +76,18 @@ let UsersService = class UsersService {
     }
     update(id, updateUserDto) {
         this.findOne(id);
-        return this.prisma.user.update({ where: { id }, data: updateUserDto });
+        this.login({
+            email: updateUserDto.email,
+            password: updateUserDto.password,
+        });
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                name: updateUserDto.name,
+                email: updateUserDto.email,
+                profileImage: updateUserDto.profileImage,
+            },
+        });
     }
     remove(id) {
         this.findOne(id);
