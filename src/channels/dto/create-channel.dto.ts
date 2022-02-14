@@ -4,4 +4,5 @@ export class CreateChannelDto {
   image: string;
   isPrivate: boolean;
   password: string;
+  userId: number;
 }

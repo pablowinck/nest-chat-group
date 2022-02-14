@@ -4,7 +4,9 @@ import { UpdateChannelDto } from "./dto/update-channel.dto";
 export declare class ChannelsController {
     private readonly channelsService;
     constructor(channelsService: ChannelsService);
-    create(createChannelDto: CreateChannelDto): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
+    create(createChannelDto: CreateChannelDto): import(".prisma/client").Prisma.Prisma__ChannelClient<{
+        id: number;
+    }>;
     findAll(): import(".prisma/client").PrismaPromise<import(".prisma/client").Channel[]>;
     findOne(id: string): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
     addMember(channelId: string, userId: string): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;

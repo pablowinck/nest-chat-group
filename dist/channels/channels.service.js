@@ -26,6 +26,9 @@ let ChannelsService = class ChannelsService {
                 password: createChannelDto.password,
                 createdAt: new Date(),
             },
+            select: {
+                id: true,
+            },
         });
     }
     findAll() {

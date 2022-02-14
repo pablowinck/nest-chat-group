@@ -75,11 +75,6 @@ let UsersService = class UsersService {
         return user;
     }
     update(id, updateUserDto) {
-        this.findOne(id);
-        this.login({
-            email: updateUserDto.email,
-            password: updateUserDto.password,
-        });
         return this.prisma.user.update({
             where: { id },
             data: {

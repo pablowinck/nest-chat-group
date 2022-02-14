@@ -16,6 +16,9 @@ export class ChannelsService {
         password: createChannelDto.password,
         createdAt: new Date(),
       },
+      select: {
+        id: true,
+      },
     });
   }
 

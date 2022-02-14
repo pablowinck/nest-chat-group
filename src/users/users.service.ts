@@ -27,9 +27,6 @@ export class UsersService {
   }
 
   login(loginUserDto: LoginUserDto) {
-    // bcrypt.hash(loginUserDto.password, 10).then((hash) => {
-    //   console.log("password", hash);
-    // });
 
     const user = this.prisma.user.findUnique({
       where: { email: loginUserDto.email },
@@ -46,19 +43,13 @@ export class UsersService {
     if (!user) throw new HttpException("User not found", HttpStatus.NOT_FOUND);
 
     return user.then((data) => {
-      bcrypt.hash(loginUserDto.password, 10).then((hash) => {
-        bcrypt.compare(hash, data.password, (err, result) => {
+      // bcrypt.hash(loginUserDto.password, 10).then((hash) => {
+        bcrypt.compare(loginUserDto.password, data.password, (err, result) => {
           if (err)
             throw new HttpException("Wrong password", HttpStatus.BAD_REQUEST);
         });
-      });
+      // });
 
-      // if (data.password !== loginUserDto.password) {
-      //   throw new HttpException(
-      //     "Password is incorrect",
-      //     HttpStatus.UNAUTHORIZED
-      //   );
-      // }
       return {
         id: data.id,
         name: data.name,
@@ -83,9 +74,8 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    this.findOne(id);
-    this.login({
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    await this.login({
       email: updateUserDto.email,
       password: updateUserDto.password,
     });
