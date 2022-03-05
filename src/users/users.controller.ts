@@ -45,4 +45,9 @@ export class UsersController {
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }
+
+  @Post("/disable/:id")
+  disable(@Param("id") id: string, @Body() data: { password: string }) {
+    return this.usersService.disable(+id, data.password);
+  }
 }

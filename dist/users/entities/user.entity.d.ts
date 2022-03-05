@@ -5,4 +5,5 @@ export declare class User {
     password: string;
     profileImage: string;
     createdAt: Date;
+    enable: boolean;
 }

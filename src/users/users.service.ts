@@ -26,37 +26,39 @@ export class UsersService {
     });
   }
 
-  login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto: LoginUserDto) {
+    const user = await this.prisma.user
+      .findUnique({
+        where: { email: loginUserDto.email },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          password: true,
+          profileImage: true,
+          enable: true,
+        },
+        rejectOnNotFound: true,
+      })
+      .then((user) => {
+        return user;
+      });
 
-    const user = this.prisma.user.findUnique({
-      where: { email: loginUserDto.email },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        password: true,
-        profileImage: true,
-      },
-      rejectOnNotFound: true,
-    });
+    if (!user.enable)
+      throw new HttpException("User is disabled", HttpStatus.UNAUTHORIZED);
 
     if (!user) throw new HttpException("User not found", HttpStatus.NOT_FOUND);
 
-    return user.then((data) => {
-      // bcrypt.hash(loginUserDto.password, 10).then((hash) => {
-        bcrypt.compare(loginUserDto.password, data.password, (err, result) => {
-          if (err)
-            throw new HttpException("Wrong password", HttpStatus.BAD_REQUEST);
-        });
-      // });
-
-      return {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        profileImage: data.profileImage,
-      };
-    });
+    if (!bcrypt.compareSync(loginUserDto.password, user.password)) {
+      throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
+    }
+    const { id, name, email, profileImage } = user;
+    return {
+      id: id,
+      name: name,
+      email: email,
+      profileImage: profileImage,
+    };
   }
 
   findAll() {
@@ -79,18 +81,52 @@ export class UsersService {
       email: updateUserDto.email,
       password: updateUserDto.password,
     });
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        name: updateUserDto.name,
-        email: updateUserDto.email,
-        profileImage: updateUserDto.profileImage,
-      },
-    });
+    const { name, email, profileImage, createdAt } = await this.prisma.user
+      .update({
+        where: { id },
+        data: {
+          name: updateUserDto.name,
+          email: updateUserDto.email,
+          profileImage: updateUserDto.profileImage,
+        },
+      })
+      .then((user) => {
+        return user;
+      });
+
+    return {
+      id,
+      name,
+      email,
+      profileImage,
+      createdAt,
+    };
   }
 
   remove(id: number) {
     this.findOne(id);
     return this.prisma.user.delete({ where: { id } });
+  }
+
+  async disable(id: number, currentPassword: string) {
+    const { password } = await this.findOne(id);
+
+    if (!bcrypt.compareSync(currentPassword, password))
+      throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
+
+    return await this.prisma.user.update({
+      where: { id },
+      data: {
+        enable: false,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profileImage: true,
+        createdAt: true,
+        enable: true,
+      },
+    });
   }
 }

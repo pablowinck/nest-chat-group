@@ -17,6 +17,7 @@ model User {
   password     String
   profileImage String?
   createdAt    DateTime
+  enable       Boolean   @default(value: true)
   channels     Channel[]
   Message      Message[]
 }

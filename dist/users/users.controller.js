@@ -40,6 +40,9 @@ let UsersController = class UsersController {
     remove(id) {
         return this.usersService.remove(+id);
     }
+    disable(id, data) {
+        return this.usersService.disable(+id, data.password);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -83,6 +86,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)("/disable/:id"),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "disable", null);
 UsersController = __decorate([
     (0, common_1.Controller)("users"),
     __metadata("design:paramtypes", [users_service_1.UsersService])
