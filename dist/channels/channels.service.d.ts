@@ -14,6 +14,10 @@ export declare class ChannelsService {
     findAllMembers(channelId: number): import(".prisma/client").Prisma.Prisma__ChannelClient<{
         members: import(".prisma/client").User[];
     }>;
-    findChannelsByUserId(userId: number): import(".prisma/client").PrismaPromise<import(".prisma/client").Channel[]>;
+    findChannelsByUserId(userId: number): Promise<import(".prisma/client").Channel[]>;
     remove(id: number): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
+    findChannelsAndMessages(userId: number): Promise<{
+        channels: import(".prisma/client").Channel[];
+        messages: any[];
+    }>;
 }

@@ -1,21 +1,29 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import bcrypt from "bcrypt";
+import { ChannelsService } from "src/channels/channels.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly channelsService: ChannelsService
+  ) {}
 
-  create(createUserDto: CreateUserDto) {
-    // if (this.prisma.user.findFirst({ where: { email: createUserDto.email } })) {
-    //   throw new HttpException(
-    //     "User with this email already exists",
-    //     HttpStatus.CONFLICT
-    //   );
-    // }
-    return this.prisma.user.create({
+  async create(createUserDto: CreateUserDto) {
+    await this.prisma.user
+      .findFirst({ where: { email: createUserDto.email } })
+      .then((user) => {
+        if (user)
+          throw new HttpException(
+            "Email already exists",
+            HttpStatus.BAD_REQUEST
+          );
+      });
+
+    const user = await this.prisma.user.create({
       data: {
         name: createUserDto.name,
         email: createUserDto.email,
@@ -24,6 +32,10 @@ export class UsersService {
         createdAt: new Date(),
       },
     });
+
+    await this.channelsService.addMember(1, user.id);
+
+    return user;
   }
 
   async login(loginUserDto: LoginUserDto) {

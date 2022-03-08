@@ -45,6 +45,9 @@ let ChannelsController = class ChannelsController {
     remove(id) {
         return this.channelsService.remove(+id);
     }
+    findChannelsAndMessages(userId) {
+        return this.channelsService.findChannelsAndMessages(+userId);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -103,6 +106,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)("/all/:userId"),
+    __param(0, (0, common_1.Param)("userId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ChannelsController.prototype, "findChannelsAndMessages", null);
 ChannelsController = __decorate([
     (0, common_1.Controller)("channels"),
     __metadata("design:paramtypes", [channels_service_1.ChannelsService])

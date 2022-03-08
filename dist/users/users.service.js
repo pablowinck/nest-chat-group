@@ -15,13 +15,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const channels_service_1 = require("../channels/channels.service");
 const prisma_service_1 = require("../prisma/prisma.service");
 let UsersService = class UsersService {
-    constructor(prisma) {
+    constructor(prisma, channelsService) {
         this.prisma = prisma;
+        this.channelsService = channelsService;
     }
-    create(createUserDto) {
-        return this.prisma.user.create({
+    async create(createUserDto) {
+        await this.prisma.user
+            .findFirst({ where: { email: createUserDto.email } })
+            .then((user) => {
+            if (user)
+                throw new common_1.HttpException("Email already exists", common_1.HttpStatus.BAD_REQUEST);
+        });
+        const user = await this.prisma.user.create({
             data: {
                 name: createUserDto.name,
                 email: createUserDto.email,
@@ -30,6 +38,8 @@ let UsersService = class UsersService {
                 createdAt: new Date(),
             },
         });
+        await this.channelsService.addMember(1, user.id);
+        return user;
     }
     async login(loginUserDto) {
         const user = await this.prisma.user
@@ -128,7 +138,8 @@ let UsersService = class UsersService {
 };
 UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        channels_service_1.ChannelsService])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map

@@ -65,8 +65,8 @@ export class ChannelsService {
     });
   }
 
-  findChannelsByUserId(userId: number) {
-    return this.prisma.channel.findMany({
+  async findChannelsByUserId(userId: number) {
+    return await this.prisma.channel.findMany({
       where: {
         members: {
           some: { id: userId },
@@ -78,5 +78,41 @@ export class ChannelsService {
   remove(id: number) {
     this.findOne(id);
     return this.prisma.channel.delete({ where: { id } });
+  }
+
+  async findChannelsAndMessages(userId: number) {
+    const channels = await this.findChannelsByUserId(userId);
+
+    if (channels.length === 0) return { channels: [], messages: [] };
+
+    const messages = await this.prisma.message.findMany({
+      where: { channel: { id: channels[0].id } },
+      select: {
+        id: true,
+        text: true,
+        createdAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profileImage: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    let responseMessages = [];
+
+    messages.forEach((message) => {
+      responseMessages.push({
+        user: message.user,
+        content: message.text,
+        createdAt: message.createdAt,
+      });
+    });
+
+    return { channels, messages: responseMessages };
   }
 }

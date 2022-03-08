@@ -57,4 +57,9 @@ export class ChannelsController {
   remove(@Param("id") id: string) {
     return this.channelsService.remove(+id);
   }
+
+  @Get("/all/:userId")
+  findChannelsAndMessages(@Param("userId") userId: string) {
+    return this.channelsService.findChannelsAndMessages(+userId);
+  }
 }

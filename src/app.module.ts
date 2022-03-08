@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ChannelsModule } from "./channels/channels.module";
+import { ChannelsService } from "./channels/channels.service";
 import { MessagesModule } from "./messages/messages.module";
 import { MessagesService } from "./messages/messages.service";
 import { PrismaService } from "./prisma/prisma.service";
@@ -19,6 +20,7 @@ import { WebsocketService } from "./websocket/websocket.service";
     MessagesModule,
     MessagesService,
     UsersService,
+    ChannelsService,
   ],
 })
 export class AppModule {}

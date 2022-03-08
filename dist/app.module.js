@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const channels_module_1 = require("./channels/channels.module");
+const channels_service_1 = require("./channels/channels.service");
 const messages_module_1 = require("./messages/messages.module");
 const messages_service_1 = require("./messages/messages.service");
 const prisma_service_1 = require("./prisma/prisma.service");
@@ -30,6 +31,7 @@ AppModule = __decorate([
             messages_module_1.MessagesModule,
             messages_service_1.MessagesService,
             users_service_1.UsersService,
+            channels_service_1.ChannelsService,
         ],
     })
 ], AppModule);
