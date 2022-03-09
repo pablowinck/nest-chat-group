@@ -14,12 +14,15 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessagesController = void 0;
 const common_1 = require("@nestjs/common");
-const messages_service_1 = require("./messages.service");
 const create_message_dto_1 = require("./dto/create-message.dto");
 const update_message_dto_1 = require("./dto/update-message.dto");
+const messages_service_1 = require("./messages.service");
 let MessagesController = class MessagesController {
     constructor(messagesService) {
         this.messagesService = messagesService;
+    }
+    findByChannelId(channelId) {
+        return this.messagesService.findByChannelId(+channelId);
     }
     create(createMessageDto) {
         return this.messagesService.create(createMessageDto);
@@ -38,6 +41,13 @@ let MessagesController = class MessagesController {
     }
 };
 __decorate([
+    (0, common_1.Get)("/channel/:channelId"),
+    __param(0, (0, common_1.Param)("channelId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], MessagesController.prototype, "findByChannelId", null);
+__decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -51,29 +61,29 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], MessagesController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], MessagesController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Patch)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_message_dto_1.UpdateMessageDto]),
     __metadata("design:returntype", void 0)
 ], MessagesController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Delete)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], MessagesController.prototype, "remove", null);
 MessagesController = __decorate([
-    (0, common_1.Controller)('messages'),
+    (0, common_1.Controller)("messages"),
     __metadata("design:paramtypes", [messages_service_1.MessagesService])
 ], MessagesController);
 exports.MessagesController = MessagesController;
