@@ -30,7 +30,7 @@ let ChannelsController = class ChannelsController {
     findOne(id) {
         return this.channelsService.findOne(+id);
     }
-    addMember(channelId, userId) {
+    addMember({ channelId, userId }) {
         return this.channelsService.addMember(+channelId, +userId);
     }
     findAllMembers(channelId) {
@@ -70,11 +70,10 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Get)(":channelId/add-member/:userId"),
-    __param(0, (0, common_1.Param)("channelId")),
-    __param(1, (0, common_1.Param)("userId")),
+    (0, common_1.Post)("/join"),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "addMember", null);
 __decorate([

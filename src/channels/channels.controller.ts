@@ -30,10 +30,9 @@ export class ChannelsController {
     return this.channelsService.findOne(+id);
   }
 
-  @Get(":channelId/add-member/:userId")
+  @Post("/join")
   addMember(
-    @Param("channelId") channelId: string,
-    @Param("userId") userId: string
+    @Body() { channelId, userId }: { channelId: string; userId: string }
   ) {
     return this.channelsService.addMember(+channelId, +userId);
   }

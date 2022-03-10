@@ -9,7 +9,10 @@ export declare class ChannelsController {
     }>;
     findAll(): import(".prisma/client").PrismaPromise<import(".prisma/client").Channel[]>;
     findOne(id: string): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
-    addMember(channelId: string, userId: string): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
+    addMember({ channelId, userId }: {
+        channelId: string;
+        userId: string;
+    }): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
     findAllMembers(channelId: string): import(".prisma/client").Prisma.Prisma__ChannelClient<{
         members: import(".prisma/client").User[];
     }>;
