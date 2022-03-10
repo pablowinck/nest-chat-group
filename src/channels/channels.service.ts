@@ -6,8 +6,8 @@ import { UpdateChannelDto } from "./dto/update-channel.dto";
 @Injectable()
 export class ChannelsService {
   constructor(private readonly prisma: PrismaService) {}
-  create(createChannelDto: CreateChannelDto) {
-    return this.prisma.channel.create({
+  async create(createChannelDto: CreateChannelDto) {
+    const createdChannel = await this.prisma.channel.create({
       data: {
         name: createChannelDto.name,
         topic: createChannelDto.topic,
@@ -20,6 +20,10 @@ export class ChannelsService {
         id: true,
       },
     });
+
+    await this.addMember(createdChannel.id, +createChannelDto.userId);
+
+    return createdChannel;
   }
 
   findAll() {

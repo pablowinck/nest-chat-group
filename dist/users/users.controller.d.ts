@@ -26,10 +26,10 @@ export declare class UsersController {
         password: string;
     }): Promise<{
         name: string;
+        createdAt: Date;
+        id: number;
         email: string;
         profileImage: string;
-        createdAt: Date;
         enable: boolean;
-        id: number;
     }>;
 }

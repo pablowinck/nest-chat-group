@@ -16,8 +16,8 @@ let ChannelsService = class ChannelsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    create(createChannelDto) {
-        return this.prisma.channel.create({
+    async create(createChannelDto) {
+        const createdChannel = await this.prisma.channel.create({
             data: {
                 name: createChannelDto.name,
                 topic: createChannelDto.topic,
@@ -30,6 +30,8 @@ let ChannelsService = class ChannelsService {
                 id: true,
             },
         });
+        await this.addMember(createdChannel.id, +createChannelDto.userId);
+        return createdChannel;
     }
     findAll() {
         return this.prisma.channel.findMany();

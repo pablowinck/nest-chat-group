@@ -26,10 +26,10 @@ export declare class UsersService {
     remove(id: number): import(".prisma/client").Prisma.Prisma__UserClient<import(".prisma/client").User>;
     disable(id: number, currentPassword: string): Promise<{
         name: string;
+        createdAt: Date;
+        id: number;
         email: string;
         profileImage: string;
-        createdAt: Date;
         enable: boolean;
-        id: number;
     }>;
 }
