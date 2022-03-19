@@ -41,33 +41,31 @@ export class WebsocketService implements OnGatewayConnection {
   }
 
   @SubscribeMessage("join")
-  onJoin(@ConnectedSocket() client: Socket, @MessageBody() channel: string[]) {
+  onJoin(@ConnectedSocket() client: Socket, @MessageBody() channelId: string) {
     // client.rooms.clear();
     client.rooms.forEach((room) => {
       client.leave(room);
     });
-    if (!channel || !channel[0]) return;
+    if (!channelId) return;
 
-    console.log("[onJoin]", channel[1]);
-    client.join(channel[1]);
+    console.log("[onJoin]", channelId);
+    client.join(channelId);
 
     console.log("[onJoin]", client.id);
     client.join(client.id);
 
-    console.log("[allRooms]", client.rooms);
-
-    this.messagesService.findByChannelId(+channel[0]).then((messages) => {
-      this.server.to(client.id).emit(
-        "load-messages",
-        messages.map((message) => {
-          return {
-            user: message.user,
-            content: message.text,
-            createdAt: message.createdAt,
-          };
-        })
-      );
-    });
+    // this.messagesService.findByChannelId(+channel[0]).then((messages) => {
+    //   this.server.to(client.id).emit(
+    //     "load-messages",
+    //     messages.map((message) => {
+    //       return {
+    //         user: message.user,
+    //         content: message.text,
+    //         createdAt: message.createdAt,
+    //       };
+    //     })
+    //   );
+    // });
   }
 
   @SubscribeMessage("send-message")

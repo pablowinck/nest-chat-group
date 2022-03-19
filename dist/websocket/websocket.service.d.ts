@@ -7,6 +7,6 @@ export declare class WebsocketService implements OnGatewayConnection {
     private messagesService;
     private usersService;
     handleConnection(client: Socket): void;
-    onJoin(client: Socket, channel: string[]): void;
+    onJoin(client: Socket, channelId: string): void;
     listenForMessages(client: Socket, message: CreateMessageDto): void;
 }

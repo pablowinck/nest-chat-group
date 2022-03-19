@@ -32,26 +32,16 @@ let WebsocketService = class WebsocketService {
             }
         }
     }
-    onJoin(client, channel) {
+    onJoin(client, channelId) {
         client.rooms.forEach((room) => {
             client.leave(room);
         });
-        if (!channel || !channel[0])
+        if (!channelId)
             return;
-        console.log("[onJoin]", channel[1]);
-        client.join(channel[1]);
+        console.log("[onJoin]", channelId);
+        client.join(channelId);
         console.log("[onJoin]", client.id);
         client.join(client.id);
-        console.log("[allRooms]", client.rooms);
-        this.messagesService.findByChannelId(+channel[0]).then((messages) => {
-            this.server.to(client.id).emit("load-messages", messages.map((message) => {
-                return {
-                    user: message.user,
-                    content: message.text,
-                    createdAt: message.createdAt,
-                };
-            }));
-        });
     }
     listenForMessages(client, message) {
         console.log("[WebsocketService] send-message", message);
@@ -88,7 +78,7 @@ __decorate([
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, Array]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, String]),
     __metadata("design:returntype", void 0)
 ], WebsocketService.prototype, "onJoin", null);
 __decorate([
