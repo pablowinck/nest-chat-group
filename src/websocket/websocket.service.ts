@@ -42,7 +42,6 @@ export class WebsocketService implements OnGatewayConnection {
 
   @SubscribeMessage("join")
   onJoin(@ConnectedSocket() client: Socket, @MessageBody() channelId: string) {
-    // client.rooms.clear();
     client.rooms.forEach((room) => {
       client.leave(room);
     });
@@ -53,19 +52,6 @@ export class WebsocketService implements OnGatewayConnection {
 
     console.log("[onJoin]", client.id);
     client.join(client.id);
-
-    // this.messagesService.findByChannelId(+channel[0]).then((messages) => {
-    //   this.server.to(client.id).emit(
-    //     "load-messages",
-    //     messages.map((message) => {
-    //       return {
-    //         user: message.user,
-    //         content: message.text,
-    //         createdAt: message.createdAt,
-    //       };
-    //     })
-    //   );
-    // });
   }
 
   @SubscribeMessage("send-message")

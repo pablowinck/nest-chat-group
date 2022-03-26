@@ -33,6 +33,9 @@ let ChannelsController = class ChannelsController {
     addMember({ channelId, userId }) {
         return this.channelsService.addMember(+channelId, +userId);
     }
+    removeMember({ channelId, userId }) {
+        return this.channelsService.removeMember(+channelId, +userId);
+    }
     findAllMembers(channelId) {
         return this.channelsService.findAllMembers(+channelId);
     }
@@ -76,6 +79,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "addMember", null);
+__decorate([
+    (0, common_1.Post)("/unjoin"),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ChannelsController.prototype, "removeMember", null);
 __decorate([
     (0, common_1.Get)("/:channelId/members"),
     __param(0, (0, common_1.Param)("channelId")),

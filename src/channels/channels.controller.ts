@@ -37,6 +37,13 @@ export class ChannelsController {
     return this.channelsService.addMember(+channelId, +userId);
   }
 
+  @Post("/unjoin")
+  removeMember(
+    @Body() { channelId, userId }: { channelId: string; userId: string }
+  ) {
+    return this.channelsService.removeMember(+channelId, +userId);
+  }
+
   @Get("/:channelId/members")
   findAllMembers(@Param("channelId") channelId: string) {
     return this.channelsService.findAllMembers(+channelId);

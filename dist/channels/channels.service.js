@@ -65,6 +65,17 @@ let ChannelsService = class ChannelsService {
             },
         });
     }
+    async removeMember(channelId, userId) {
+        await this.findOne(channelId);
+        return await this.prisma.channel.update({
+            where: { id: channelId },
+            data: {
+                members: {
+                    disconnect: { id: userId },
+                },
+            },
+        });
+    }
     findAllMembers(channelId) {
         this.findOne(channelId);
         return this.prisma.channel.findUnique({

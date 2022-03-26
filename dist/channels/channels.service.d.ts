@@ -11,6 +11,7 @@ export declare class ChannelsService {
     findOne(id: number): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
     update(id: number, updateChannelDto: UpdateChannelDto): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
     addMember(channelId: number, userId: number): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
+    removeMember(channelId: number, userId: number): Promise<import(".prisma/client").Channel>;
     findAllMembers(channelId: number): import(".prisma/client").Prisma.Prisma__ChannelClient<{
         members: import(".prisma/client").User[];
     }>;

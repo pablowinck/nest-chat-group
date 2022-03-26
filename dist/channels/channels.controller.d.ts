@@ -13,6 +13,10 @@ export declare class ChannelsController {
         channelId: string;
         userId: string;
     }): import(".prisma/client").Prisma.Prisma__ChannelClient<import(".prisma/client").Channel>;
+    removeMember({ channelId, userId }: {
+        channelId: string;
+        userId: string;
+    }): Promise<import(".prisma/client").Channel>;
     findAllMembers(channelId: string): import(".prisma/client").Prisma.Prisma__ChannelClient<{
         members: import(".prisma/client").User[];
     }>;
