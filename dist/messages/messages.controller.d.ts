@@ -5,15 +5,15 @@ export declare class MessagesController {
     private readonly messagesService;
     constructor(messagesService: MessagesService);
     findByChannelId(channelId: string): import(".prisma/client").PrismaPromise<{
-        id: number;
-        text: string;
         createdAt: Date;
+        id: number;
         user: {
-            id: number;
             name: string;
-            profileImage: string;
             email: string;
+            profileImage: string;
+            id: number;
         };
+        text: string;
     }[]>;
     create(createMessageDto: CreateMessageDto): import(".prisma/client").Prisma.Prisma__MessageClient<import(".prisma/client").Message>;
     findAll(): import(".prisma/client").PrismaPromise<import(".prisma/client").Message[]>;

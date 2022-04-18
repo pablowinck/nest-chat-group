@@ -10,6 +10,7 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const s3_service_1 = require("./aws/s3.service");
 const channels_module_1 = require("./channels/channels.module");
 const channels_service_1 = require("./channels/channels.service");
 const messages_module_1 = require("./messages/messages.module");
@@ -32,6 +33,7 @@ AppModule = __decorate([
             messages_service_1.MessagesService,
             users_service_1.UsersService,
             channels_service_1.ChannelsService,
+            s3_service_1.S3Service
         ],
     })
 ], AppModule);

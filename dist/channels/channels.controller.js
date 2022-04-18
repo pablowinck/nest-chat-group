@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelsController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const channels_service_1 = require("./channels.service");
 const create_channel_dto_1 = require("./dto/create-channel.dto");
 const update_channel_dto_1 = require("./dto/update-channel.dto");
@@ -51,6 +52,9 @@ let ChannelsController = class ChannelsController {
     findChannelsAndMessages(userId) {
         return this.channelsService.findChannelsAndMessages(+userId);
     }
+    updateImage(id, file) {
+        return this.channelsService.updateImage(+id, file);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -66,64 +70,73 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Post)("/join"),
+    (0, common_1.Post)('/join'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "addMember", null);
 __decorate([
-    (0, common_1.Post)("/unjoin"),
+    (0, common_1.Post)('/unjoin'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "removeMember", null);
 __decorate([
-    (0, common_1.Get)("/:channelId/members"),
-    __param(0, (0, common_1.Param)("channelId")),
+    (0, common_1.Get)('/:channelId/members'),
+    __param(0, (0, common_1.Param)('channelId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "findAllMembers", null);
 __decorate([
-    (0, common_1.Get)("/members/:userId"),
-    __param(0, (0, common_1.Param)("userId")),
+    (0, common_1.Get)('/members/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "findByUserId", null);
 __decorate([
-    (0, common_1.Patch)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_channel_dto_1.UpdateChannelDto]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "remove", null);
 __decorate([
-    (0, common_1.Get)("/all/:userId"),
-    __param(0, (0, common_1.Param)("userId")),
+    (0, common_1.Get)('/all/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ChannelsController.prototype, "findChannelsAndMessages", null);
+__decorate([
+    (0, common_1.Patch)('/image/:id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], ChannelsController.prototype, "updateImage", null);
 ChannelsController = __decorate([
-    (0, common_1.Controller)("channels"),
+    (0, common_1.Controller)('channels'),
     __metadata("design:paramtypes", [channels_service_1.ChannelsService])
 ], ChannelsController);
 exports.ChannelsController = ChannelsController;

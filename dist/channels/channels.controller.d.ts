@@ -1,6 +1,7 @@
-import { ChannelsService } from "./channels.service";
-import { CreateChannelDto } from "./dto/create-channel.dto";
-import { UpdateChannelDto } from "./dto/update-channel.dto";
+/// <reference types="multer" />
+import { ChannelsService } from './channels.service';
+import { CreateChannelDto } from './dto/create-channel.dto';
+import { UpdateChannelDto } from './dto/update-channel.dto';
 export declare class ChannelsController {
     private readonly channelsService;
     constructor(channelsService: ChannelsService);
@@ -26,5 +27,11 @@ export declare class ChannelsController {
     findChannelsAndMessages(userId: string): Promise<{
         channels: import(".prisma/client").Channel[];
         messages: any[];
+    }>;
+    updateImage(id: string, file: Express.Multer.File): Promise<{
+        id: number;
+        name: string;
+        image: string;
+        createdAt: Date;
     }>;
 }

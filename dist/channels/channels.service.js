@@ -11,10 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelsService = void 0;
 const common_1 = require("@nestjs/common");
+const s3_service_1 = require("../aws/s3.service");
 const prisma_service_1 = require("../prisma/prisma.service");
 let ChannelsService = class ChannelsService {
-    constructor(prisma) {
+    constructor(prisma, s3Service) {
         this.prisma = prisma;
+        this.s3Service = s3Service;
     }
     async create(createChannelDto) {
         const createdChannel = await this.prisma.channel.create({
@@ -38,13 +40,13 @@ let ChannelsService = class ChannelsService {
     }
     findOne(id) {
         if (!id)
-            throw new common_1.HttpException("id is required", common_1.HttpStatus.BAD_REQUEST);
+            throw new common_1.HttpException('id is required', common_1.HttpStatus.BAD_REQUEST);
         const channel = this.prisma.channel.findUnique({
             where: { id: id },
             rejectOnNotFound: true,
         });
         if (!channel)
-            throw new common_1.HttpException("Channel not found", common_1.HttpStatus.NOT_FOUND);
+            throw new common_1.HttpException('Channel not found', common_1.HttpStatus.NOT_FOUND);
         return channel;
     }
     update(id, updateChannelDto) {
@@ -115,7 +117,7 @@ let ChannelsService = class ChannelsService {
                     },
                 },
             },
-            orderBy: { createdAt: "desc" },
+            orderBy: { createdAt: 'desc' },
         });
         let responseMessages = [];
         messages.forEach((message) => {
@@ -127,10 +129,33 @@ let ChannelsService = class ChannelsService {
         });
         return { channels, messages: responseMessages };
     }
+    async updateImage(id, file) {
+        const { image } = await this.findOne(id);
+        const { location: url } = await this.s3Service.upload(file);
+        if (image && image !== '/images/default-avatar.png')
+            await this.s3Service.delete(this.s3Service.getKeyFromUrl(image));
+        const { id: channelId, name, createdAt, } = await this.prisma.channel
+            .update({
+            where: { id },
+            data: {
+                image: url,
+            },
+        })
+            .then((channel) => {
+            return channel;
+        });
+        return {
+            id: channelId,
+            name,
+            image: url,
+            createdAt,
+        };
+    }
 };
 ChannelsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        s3_service_1.S3Service])
 ], ChannelsService);
 exports.ChannelsService = ChannelsService;
 //# sourceMappingURL=channels.service.js.map

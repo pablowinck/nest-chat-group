@@ -17,17 +17,19 @@ const common_1 = require("@nestjs/common");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const channels_service_1 = require("../channels/channels.service");
 const prisma_service_1 = require("../prisma/prisma.service");
+const s3_service_1 = require("../aws/s3.service");
 let UsersService = class UsersService {
-    constructor(prisma, channelsService) {
+    constructor(prisma, channelsService, s3Service) {
         this.prisma = prisma;
         this.channelsService = channelsService;
+        this.s3Service = s3Service;
     }
     async create(createUserDto) {
         await this.prisma.user
             .findFirst({ where: { email: createUserDto.email } })
             .then((user) => {
             if (user)
-                throw new common_1.HttpException("Email already exists", common_1.HttpStatus.BAD_REQUEST);
+                throw new common_1.HttpException('Email already exists', common_1.HttpStatus.BAD_REQUEST);
         });
         const user = await this.prisma.user.create({
             data: {
@@ -42,8 +44,7 @@ let UsersService = class UsersService {
         return user;
     }
     async login(loginUserDto) {
-        const user = await this.prisma.user
-            .findUnique({
+        const user = await this.prisma.user.findUnique({
             where: { email: loginUserDto.email },
             select: {
                 id: true,
@@ -54,23 +55,20 @@ let UsersService = class UsersService {
                 enable: true,
             },
             rejectOnNotFound: true,
-        })
-            .then((user) => {
-            return user;
         });
         if (!user.enable)
-            throw new common_1.HttpException("User is disabled", common_1.HttpStatus.UNAUTHORIZED);
+            throw new common_1.HttpException('User is disabled', common_1.HttpStatus.UNAUTHORIZED);
         if (!user)
-            throw new common_1.HttpException("User not found", common_1.HttpStatus.NOT_FOUND);
+            throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
         if (!bcrypt_1.default.compareSync(loginUserDto.password, user.password)) {
-            throw new common_1.HttpException("Wrong password", common_1.HttpStatus.UNAUTHORIZED);
+            throw new common_1.HttpException('Wrong password', common_1.HttpStatus.UNAUTHORIZED);
         }
         const { id, name, email, profileImage } = user;
         return {
-            id: id,
-            name: name,
-            email: email,
-            profileImage: profileImage,
+            id,
+            name,
+            email,
+            profileImage,
         };
     }
     findAll() {
@@ -78,13 +76,13 @@ let UsersService = class UsersService {
     }
     findOne(id) {
         if (!id)
-            throw new common_1.HttpException("id is required", common_1.HttpStatus.BAD_REQUEST);
+            throw new common_1.HttpException('id is required', common_1.HttpStatus.BAD_REQUEST);
         const user = this.prisma.user.findUnique({
             where: { id },
             rejectOnNotFound: true,
         });
         if (!user)
-            throw new common_1.HttpException("User not found", common_1.HttpStatus.NOT_FOUND);
+            throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
         return user;
     }
     async update(id, updateUserDto) {
@@ -119,7 +117,7 @@ let UsersService = class UsersService {
     async disable(id, currentPassword) {
         const { password } = await this.findOne(id);
         if (!bcrypt_1.default.compareSync(currentPassword, password))
-            throw new common_1.HttpException("Wrong password", common_1.HttpStatus.UNAUTHORIZED);
+            throw new common_1.HttpException('Wrong password', common_1.HttpStatus.UNAUTHORIZED);
         return await this.prisma.user.update({
             where: { id },
             data: {
@@ -135,11 +133,35 @@ let UsersService = class UsersService {
             },
         });
     }
+    async updateImage(id, file) {
+        const { profileImage } = await this.findOne(id);
+        const { location: url } = await this.s3Service.upload(file);
+        if (profileImage && profileImage !== '/images/default-avatar.png')
+            await this.s3Service.delete(this.s3Service.getKeyFromUrl(profileImage));
+        const { id: userId, name, email, createdAt, } = await this.prisma.user
+            .update({
+            where: { id },
+            data: {
+                profileImage: url,
+            },
+        })
+            .then((user) => {
+            return user;
+        });
+        return {
+            id: userId,
+            name,
+            email,
+            profileImage: url,
+            createdAt,
+        };
+    }
 };
 UsersService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        channels_service_1.ChannelsService])
+        channels_service_1.ChannelsService,
+        s3_service_1.S3Service])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map

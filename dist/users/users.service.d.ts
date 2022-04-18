@@ -1,12 +1,15 @@
-import { ChannelsService } from "src/channels/channels.service";
-import { PrismaService } from "src/prisma/prisma.service";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { LoginUserDto } from "./dto/login-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
+/// <reference types="multer" />
+import { ChannelsService } from 'src/channels/channels.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { S3Service } from 'src/aws/s3.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 export declare class UsersService {
     private readonly prisma;
     private readonly channelsService;
-    constructor(prisma: PrismaService, channelsService: ChannelsService);
+    private s3Service;
+    constructor(prisma: PrismaService, channelsService: ChannelsService, s3Service: S3Service);
     create(createUserDto: CreateUserDto): Promise<import(".prisma/client").User>;
     login(loginUserDto: LoginUserDto): Promise<{
         id: number;
@@ -31,5 +34,12 @@ export declare class UsersService {
         email: string;
         profileImage: string;
         enable: boolean;
+    }>;
+    updateImage(id: number, file: Express.Multer.File): Promise<{
+        id: number;
+        name: string;
+        email: string;
+        profileImage: string;
+        createdAt: Date;
     }>;
 }

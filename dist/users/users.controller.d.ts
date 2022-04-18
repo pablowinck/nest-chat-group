@@ -1,3 +1,4 @@
+/// <reference types="multer" />
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -15,6 +16,13 @@ export declare class UsersController {
     findAll(): import(".prisma/client").PrismaPromise<import(".prisma/client").User[]>;
     findOne(id: string): import(".prisma/client").Prisma.Prisma__UserClient<import(".prisma/client").User>;
     update(id: string, updateUserDto: UpdateUserDto): Promise<{
+        id: number;
+        name: string;
+        email: string;
+        profileImage: string;
+        createdAt: Date;
+    }>;
+    updateImage(id: string, file: Express.Multer.File): Promise<{
         id: number;
         name: string;
         email: string;

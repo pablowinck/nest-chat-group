@@ -1,15 +1,18 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import bcrypt from "bcrypt";
-import { ChannelsService } from "src/channels/channels.service";
-import { PrismaService } from "src/prisma/prisma.service";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { LoginUserDto } from "./dto/login-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
+import { HttpService } from '@nestjs/axios'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import bcrypt from 'bcrypt'
+import { ChannelsService } from 'src/channels/channels.service'
+import { PrismaService } from 'src/prisma/prisma.service'
+import { S3Service } from 'src/aws/s3.service'
+import { CreateUserDto } from './dto/create-user.dto'
+import { LoginUserDto } from './dto/login-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly channelsService: ChannelsService
+    private readonly channelsService: ChannelsService,
+    private s3Service: S3Service
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -18,10 +21,10 @@ export class UsersService {
       .then((user) => {
         if (user)
           throw new HttpException(
-            "Email already exists",
+            'Email already exists',
             HttpStatus.BAD_REQUEST
-          );
-      });
+          )
+      })
 
     const user = await this.prisma.user.create({
       data: {
@@ -31,68 +34,64 @@ export class UsersService {
         profileImage: createUserDto.profileImage,
         createdAt: new Date(),
       },
-    });
+    })
 
-    await this.channelsService.addMember(1, user.id);
+    await this.channelsService.addMember(1, user.id)
 
-    return user;
+    return user
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const user = await this.prisma.user
-      .findUnique({
-        where: { email: loginUserDto.email },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          password: true,
-          profileImage: true,
-          enable: true,
-        },
-        rejectOnNotFound: true,
-      })
-      .then((user) => {
-        return user;
-      });
+    const user = await this.prisma.user.findUnique({
+      where: { email: loginUserDto.email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+        profileImage: true,
+        enable: true,
+      },
+      rejectOnNotFound: true,
+    })
 
     if (!user.enable)
-      throw new HttpException("User is disabled", HttpStatus.UNAUTHORIZED);
+      throw new HttpException('User is disabled', HttpStatus.UNAUTHORIZED)
 
-    if (!user) throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
 
     if (!bcrypt.compareSync(loginUserDto.password, user.password)) {
-      throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Wrong password', HttpStatus.UNAUTHORIZED)
     }
-    const { id, name, email, profileImage } = user;
+    const { id, name, email, profileImage } = user
     return {
-      id: id,
-      name: name,
-      email: email,
-      profileImage: profileImage,
-    };
+      id,
+      name,
+      email,
+      profileImage,
+    }
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany()
   }
 
   findOne(id: number) {
-    if (!id) throw new HttpException("id is required", HttpStatus.BAD_REQUEST);
+    if (!id) throw new HttpException('id is required', HttpStatus.BAD_REQUEST)
     const user = this.prisma.user.findUnique({
       where: { id },
       rejectOnNotFound: true,
-    });
+    })
 
-    if (!user) throw new HttpException("User not found", HttpStatus.NOT_FOUND);
-    return user;
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    return user
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     await this.login({
       email: updateUserDto.email,
       password: updateUserDto.password,
-    });
+    })
     const { name, email, profileImage, createdAt } = await this.prisma.user
       .update({
         where: { id },
@@ -103,8 +102,8 @@ export class UsersService {
         },
       })
       .then((user) => {
-        return user;
-      });
+        return user
+      })
 
     return {
       id,
@@ -112,19 +111,19 @@ export class UsersService {
       email,
       profileImage,
       createdAt,
-    };
+    }
   }
 
   remove(id: number) {
-    this.findOne(id);
-    return this.prisma.user.delete({ where: { id } });
+    this.findOne(id)
+    return this.prisma.user.delete({ where: { id } })
   }
 
   async disable(id: number, currentPassword: string) {
-    const { password } = await this.findOne(id);
+    const { password } = await this.findOne(id)
 
     if (!bcrypt.compareSync(currentPassword, password))
-      throw new HttpException("Wrong password", HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Wrong password', HttpStatus.UNAUTHORIZED)
 
     return await this.prisma.user.update({
       where: { id },
@@ -139,6 +138,36 @@ export class UsersService {
         createdAt: true,
         enable: true,
       },
-    });
+    })
+  }
+
+  async updateImage(id: number, file: Express.Multer.File) {
+    const { profileImage } = await this.findOne(id)
+    const { location: url } = await this.s3Service.upload(file)
+    if (profileImage && profileImage !== '/images/default-avatar.png')
+      await this.s3Service.delete(this.s3Service.getKeyFromUrl(profileImage))
+    const {
+      id: userId,
+      name,
+      email,
+      createdAt,
+    } = await this.prisma.user
+      .update({
+        where: { id },
+        data: {
+          profileImage: url,
+        },
+      })
+      .then((user) => {
+        return user
+      })
+
+    return {
+      id: userId,
+      name,
+      email,
+      profileImage: url,
+      createdAt,
+    }
   }
 }

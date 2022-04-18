@@ -1,9 +1,12 @@
-import { PrismaService } from "src/prisma/prisma.service";
-import { CreateChannelDto } from "./dto/create-channel.dto";
-import { UpdateChannelDto } from "./dto/update-channel.dto";
+/// <reference types="multer" />
+import { S3Service } from 'src/aws/s3.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateChannelDto } from './dto/create-channel.dto';
+import { UpdateChannelDto } from './dto/update-channel.dto';
 export declare class ChannelsService {
     private readonly prisma;
-    constructor(prisma: PrismaService);
+    private s3Service;
+    constructor(prisma: PrismaService, s3Service: S3Service);
     create(createChannelDto: CreateChannelDto): Promise<{
         id: number;
     }>;
@@ -20,5 +23,11 @@ export declare class ChannelsService {
     findChannelsAndMessages(userId: number): Promise<{
         channels: import(".prisma/client").Channel[];
         messages: any[];
+    }>;
+    updateImage(id: number, file: Express.Multer.File): Promise<{
+        id: number;
+        name: string;
+        image: string;
+        createdAt: Date;
     }>;
 }
